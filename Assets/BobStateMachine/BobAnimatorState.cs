@@ -3,21 +3,23 @@ using System.Collections;
 
 namespace Engine
 {
-	public class BobAnimatorState : BobState<MonoBehaviour>
+    [System.Serializable]
+	public class BobAnimatorState : BobState<Animator>
     {
         private float m_Timer = 0;
-        public override void OnEnter(MonoBehaviour owner)
+        public override void OnEnter(Animator owner)
         {
             base.OnEnter(owner);
             m_Timer = 0;
         }
 
-        public override void OnExit(MonoBehaviour owner)
+        public override void OnExit(Animator owner)
         {
             base.OnExit(owner);
+            m_Timer = 0;
         }
 
-        public override void OnUpdate(MonoBehaviour owner)
+        public override void OnUpdate(Animator owner)
         {
             m_Timer += Time.deltaTime;
         }
