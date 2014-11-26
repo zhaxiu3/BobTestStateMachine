@@ -26,7 +26,7 @@ namespace Engine
         /// <param name="to"></param>
         /// <param name="uniquename"></param>
         /// <param name="uniquehash"></param>
-        public void AddTransition(BobState<T> from, BobState<T> to, string uniquename, int uniquehash)
+        public virtual void AddTransition(BobState<T> from, BobState<T> to, string uniquename, int uniquehash)
         {
             BobTransition<T> _newTrans = new BobTransition<T>();
             _newTrans.m_fromState = from;
@@ -35,19 +35,39 @@ namespace Engine
             _newTrans.m_uniqueHash = uniquehash;
             m_Transitions.Add(_newTrans);
         }
+        /// <summary>
+        /// 发送事件
+        /// </summary>
+        /// <param name="transname">事件名称</param>
+        /// <returns></returns>
+        public virtual bool SendEvent(string transname){
+            if (!IsEventAvailable(transname))
+            {
+                return false;
+            }
+            DoSendEvent(transname);
+            return true;
+        }
+        protected void DoSendEvent(string transname)
+        {
+            int index = IndexOf(transname);
+            BobTransition<T> _trans = m_Transitions[index];
+            ChangeState(_trans.m_toState);
+        }
 
-        public void SendEvent(string transname){
+        protected bool IsEventAvailable(string transname)
+        {
             int index = IndexOf(transname);
             if (index == -1)
             {
-                return;
+                return false;
             }
             BobTransition<T> _trans = m_Transitions[index];
             if (_trans.m_fromState != m_CurrentState)
             {
-                return;
+                return false;
             }
-            ChangeState(_trans.m_toState);
+            return true;
         }
         public void ChangeState(BobState<T> newState){
             if(null != m_CurrentState)            
@@ -57,11 +77,15 @@ namespace Engine
             newState.OnEnter(m_Owner);
             m_CurrentState = newState;
         }
-        public void OnUpdate() 
+        public virtual void OnUpdate() 
         {
             if (m_CurrentState != null && m_CurrentState.active)
             {
                 m_CurrentState.OnUpdate(m_Owner);
+            }
+            else
+            {
+                Debug.LogError("Error: FSM has no currentState or currentState is not active");
             }
         }
 

@@ -13,23 +13,22 @@ namespace Engine
         /// 元素列表
         /// </summary>
 	    [UnityEngine.SerializeField]
-	    private List<TValue> values = new List<TValue>();
+	    public List<TValue> values = new List<TValue>();
         /// <summary>
         /// 元素名字列表
         /// </summary>
 	    [UnityEngine.SerializeField]
-	    private List<TKey> keys = new List<TKey>();
+	    public List<TKey> keys = new List<TKey>();
         /// <summary>
         /// 添加新的元素
         /// </summary>
         /// <param name="value">元素值</param>
         /// <param name="name">元素名字</param>
 	    public void AddValue(TKey key, TValue value)
-	    {
-	
+	    {	
 	        if (keys.Contains(key))
 	        {
-	            return;
+                throw new System.Exception(string.Format("The key {0} has already existed!",key.ToString()));
 	        }
 	        values.Add(value);
 	        keys.Add(key);
