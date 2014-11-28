@@ -6,32 +6,45 @@ namespace Engine
 
 	public class BobStateMachineRoot : MonoBehaviour
     {
-        BobAnimatorFSM m_FSM0 = new BobAnimatorFSM();
-        BobAnimatorState state1 = new BobAnimatorState();
-        BobAnimatorState state2 = new BobAnimatorState();
-        BobAnimatorState state3 = new BobAnimatorState();
-        public string m_fsmJson;
-        //BobAnimatorFSM m_FSM1 = newBobAnimatorFSM();
+        public BobAnimatorFSM m_FSM0 = new BobAnimatorFSM();
         void Awake()
         {
-            m_FSM0.Init(state1, this.GetComponent<Animator>()); int _____________fixit;
+            BobAnimatorState state1 = BobAnimatorState.CreateState("Base Layer.State1");
+            BobAnimatorState state2 = BobAnimatorState.CreateState("Base Layer.State2");
+            BobAnimatorState state3 = BobAnimatorState.CreateState("Base Layer.State3");
 
-            AnimatorParameter _param1 = new AnimatorParameter("Trigger_12", AnimatorParameterType.TRIGGER, true);
-            AnimatorParameter _param2 = new AnimatorParameter("Trigger_23", AnimatorParameterType.TRIGGER, true);
-            AnimatorParameter _param3 = new AnimatorParameter("Trigger_31", AnimatorParameterType.TRIGGER, true);
+            m_FSM0.m_States.AddValue(Animator.StringToHash(state1.m_name), state1);
+            m_FSM0.m_States.AddValue(Animator.StringToHash(state2.m_name), state2);
+            m_FSM0.m_States.AddValue(Animator.StringToHash(state3.m_name), state3);
 
-            m_FSM0.AddTransition(state1, state2, "trans12", Animator.StringToHash("trans12"), new List<AnimatorParameter>() { _param1 }, 0.1f);
-            m_FSM0.AddTransition(state2, state3, "trans23", Animator.StringToHash("trans23"), new List<AnimatorParameter>() { _param2 }, 0.3f);
-            m_FSM0.AddTransition(state3, state1, "trans31", Animator.StringToHash("trans31"), new List<AnimatorParameter>() { _param3 });
-
-            m_fsmJson = fastJSON.JSON.ToJSON(m_FSM0);
-            Debug.Log(m_fsmJson);
+            m_FSM0.Init(state1, this.GetComponent<Animator>()); 
             
-           
+
+            AnimatorParameter _param1 = AnimatorParameter.CreateNewTrigger("Trigger_12");
+            AnimatorParameter _param2 = AnimatorParameter.CreateNewTrigger("Trigger_23");
+            AnimatorParameter _param3 = AnimatorParameter.CreateNewTrigger("Trigger_31");
+            AnimatorParameter _param4 = AnimatorParameter.CreateNewInt("intParam", 0);
+
+            m_FSM0.m_parameters.Add(_param1);
+            m_FSM0.m_parameters.Add(_param2);
+            m_FSM0.m_parameters.Add(_param3);
+            m_FSM0.m_parameters.Add(_param4);
+
+            BobTransitionCondition _condition1 = BobTransitionCondition.CreateTransitionCondition(new List<AnimatorParameter>() { _param1,_param2,_param4 },0.1f);
+            BobTransitionCondition _condition2 = BobTransitionCondition.CreateTransitionCondition(new List<AnimatorParameter>() { _param2 }, 0.3f);
+            BobTransitionCondition _condition3 = BobTransitionCondition.CreateTransitionCondition(new List<AnimatorParameter>() { _param3 });
+            BobTransitionCondition _condition4 = BobTransitionCondition.CreateTransitionCondition(new List<AnimatorParameter>() { _param3 });
+
+            m_FSM0.AddTransition(state1, state2, "trans12", Animator.StringToHash("trans12"), _condition1);
+            m_FSM0.AddTransition(state1, state3, "trans13", Animator.StringToHash("trans13"), _condition2);
+            m_FSM0.AddTransition(state2, state3, "trans23", Animator.StringToHash("trans23"), _condition3);
+            m_FSM0.AddTransition(state3, state1, "trans31", Animator.StringToHash("trans31"), _condition4);
+
+            m_FSM0.AddGlobalTransition(state3, "trans3", Animator.StringToHash("trans3"), _condition2);
+                       
         }
 		// Use this for initialization
-		void Start () {
-            
+		void Start () {            
 		
 		}
 		
@@ -53,6 +66,13 @@ namespace Engine
                 //GetComponent<Animator>().SetTrigger("Trigger_31");
                 m_FSM0.SendEvent("trans31");
             }
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                //GetComponent<Animator>().SetTrigger("Trigger_31");
+                m_FSM0.SendGlobalEvent("trans3");
+            }
+            
 		}
+
 	}
 }

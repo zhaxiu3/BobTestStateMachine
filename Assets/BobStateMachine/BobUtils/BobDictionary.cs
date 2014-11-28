@@ -7,7 +7,7 @@ namespace Engine
     /// 
 	/// </summary>
 	[System.Serializable]
-	public class BobDictionary<TKey,TValue>
+	public class BobDictionary<TKey,TValue> 
 	{
         /// <summary>
         /// 元素列表

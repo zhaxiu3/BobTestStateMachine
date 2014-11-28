@@ -47,12 +47,15 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\BobStateMachine\BobAnimatorFSM.cs" />
+     <Compile Include="Assets\BobStateMachine\BobAnimatorFSMData.cs" />
      <Compile Include="Assets\BobStateMachine\BobAnimatorState.cs" />
+     <Compile Include="Assets\BobStateMachine\BobAnimatorTransition.cs" />
      <Compile Include="Assets\BobStateMachine\BobFSM.cs" />
      <Compile Include="Assets\BobStateMachine\BobState.cs" />
      <Compile Include="Assets\BobStateMachine\BobStateMachineRoot.cs" />
      <Compile Include="Assets\BobStateMachine\BobTransition.cs" />
      <Compile Include="Assets\BobStateMachine\BobUtils\BobDictionary.cs" />
+     <Compile Include="Assets\TestStateMachine\Scripts\TestDataSerializable.cs" />
      <Compile Include="Assets\fastJSON\testJSON.cs" />
  <Reference Include="fastJSON">
  <HintPath>Assets\fastJSON\fastJSON.dll</HintPath>

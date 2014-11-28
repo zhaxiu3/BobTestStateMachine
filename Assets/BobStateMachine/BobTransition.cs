@@ -9,6 +9,13 @@ namespace Engine
         public string m_uniqueName;
         public BobState<T> m_fromState;
         public BobState<T> m_toState;
+        public bool isGlobal
+        {
+            get
+            {
+                return m_fromState == null;
+            }
+        }
     }
 }
 

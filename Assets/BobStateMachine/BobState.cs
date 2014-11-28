@@ -15,12 +15,12 @@ namespace Engine
 	    /// <summary>
 	    /// 状态名
 	    /// </summary>
-	    public BobStateEnum m_name;
+	    public string m_name;
         
-        public virtual void OnEnter(T owner) {
+        public virtual void OnEnter(T owner, string transname) {
             active = true;
         }
-        public virtual void OnExit(T owner) {
+        public virtual void OnExit(T owner, string transname) {
             active = false;
         }
         public virtual void OnUpdate(T owner) { 

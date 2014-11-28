@@ -10,14 +10,27 @@ namespace Engine
 	    /// 状态机的所有者
 	    /// </summary>
 	    protected T m_Owner;
-        private BobState<T> m_CurrentState;
-        private BobState<T> m_GlobalState;
+        public BobState<T> m_CurrentState;
         private List<BobTransition<T>> m_Transitions = new List<BobTransition<T>>();
+
+        #region 处理Global事件
+        public BobState<T> m_GlobalState;
+        private List<BobTransition<T>> m_GlobalTransitions = new List<BobTransition<T>>();
+        #endregion
 
         public void Init(BobState<T> InitialState, T owner)
         {
+            setOwner(owner);
+            Init(InitialState);
+        }
+        public void Init(BobState<T> InitialState)
+        {
+            ChangeState(InitialState, string.Empty);
+        }
+
+        public void setOwner(T owner)
+        {
             m_Owner = owner;
-            ChangeState(InitialState);
         }
         /// <summary>
         /// 添加新的Transition
@@ -52,7 +65,28 @@ namespace Engine
         {
             int index = IndexOf(transname);
             BobTransition<T> _trans = m_Transitions[index];
-            ChangeState(_trans.m_toState);
+            ChangeState(_trans.m_toState,_trans.m_uniqueName);
+        }
+
+        public virtual void AddGlobalTransition(BobState<T> to, string uniquename, int uniquehash)
+        {
+            BobTransition<T> _newTrans = new BobTransition<T>();
+            _newTrans.m_fromState = null;
+            _newTrans.m_toState = to;
+            _newTrans.m_uniqueName = uniquename;
+            _newTrans.m_uniqueHash = uniquehash;
+            m_GlobalTransitions.Add(_newTrans);
+        }
+        public virtual bool SendGlobalEvent(string transname)
+        {
+            DoSendEvent(transname);
+            return true;
+        }
+        protected void DoSendGlobalEvent(string transname)
+        {
+            int index = IndexOf(transname);
+            BobTransition<T> _trans = m_GlobalTransitions[index];
+            ChangeState(_trans.m_toState, _trans.m_uniqueName);
         }
 
         protected bool IsEventAvailable(string transname)
@@ -63,18 +97,27 @@ namespace Engine
                 return false;
             }
             BobTransition<T> _trans = m_Transitions[index];
+
+            if (_trans.isGlobal)
+            {//若是全局事件，则不判断当前状态
+                return true;
+            }
             if (_trans.m_fromState != m_CurrentState)
             {
                 return false;
             }
             return true;
         }
-        public void ChangeState(BobState<T> newState){
+        public void ChangeState(BobState<T> newState, string transname){
             if(null != m_CurrentState)            
             {            
-                m_CurrentState.OnExit(m_Owner);
+                m_CurrentState.OnExit(m_Owner, transname);
             }
-            newState.OnEnter(m_Owner);
+            if (newState == null)
+            {
+                Debug.LogError("what i am null!!!!!");
+            }
+            newState.OnEnter(m_Owner, transname);
             m_CurrentState = newState;
         }
         public virtual void OnUpdate() 

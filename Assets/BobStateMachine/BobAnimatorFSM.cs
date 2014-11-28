@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace Engine
 {
+  
 	[System.Serializable]
 	public class BobAnimatorFSM : BobFSM<Animator>
     {
@@ -11,42 +12,53 @@ namespace Engine
         /// 对应的Animator的layer
         /// </summary>
         public int m_AnimatorLayer = 0;
-        public BobDictionary<string, List<AnimatorParameter>> m_TransitionParameters = new BobDictionary<string, List<AnimatorParameter>>();
-        /// <summary>
-        /// 状态的ExitTime
-        /// </summary>
-        public BobDictionary<string, float> m_TransitionExitTime = new BobDictionary<string, float>();
-	    public override bool SendEvent(string transname)
+        public BobHashStateMap m_States = new BobHashStateMap();
+        public List<AnimatorParameter> m_parameters = new List<AnimatorParameter>();
+        public BobAnimatorState m_AnyState = new BobAnimatorState() { m_name = "AnyState"};
+        public void AddTransition(BobAnimatorState from, BobAnimatorState to, string uniquename, int uniquehash, BobTransitionCondition parameters)
         {
-            List<AnimatorParameter> _params = m_TransitionParameters.getValue(transname);
-            float _ExitTime = m_TransitionExitTime.getValue(transname);
+            base.AddTransition(from, to, uniquename, uniquehash);
+            from.m_TransitionConditions.AddValue(uniquename, parameters);
+        }
+        public void AddGlobalTransition(BobAnimatorState to, string uniquename, int uniquehash, BobTransitionCondition parameters)
+        {
+            base.AddGlobalTransition(to, uniquename, uniquehash);
+            m_AnyState.m_TransitionConditions.AddValue(uniquename, parameters);
+        }
 
+        public override bool SendEvent(string transname)
+        {
             if (!IsEventAvailable(transname))
             {
                 return false;
             }
-            for (int i = 0; i < _params.Count; i++)
+            BobTransitionCondition _params = ((BobAnimatorState)this.m_CurrentState).m_TransitionConditions.getValue(transname);
+            if (_params == null)
             {
-                SetParameter(_params[i]);
+                return false;
             }
-            if (_ExitTime == 0)
-            {                
-                DoSendEvent(transname);
-            }
-            else
+            float _ExitTime = _params.m_ExitTime;
+            for (int i = 0; i < _params.m_parameters.Count; i++)
             {
-                m_bIsWaitingForExitTime = true;
-                m_currentStateInfo = m_Owner.GetCurrentAnimatorStateInfo(m_AnimatorLayer);
-                m_waitedEvent = transname;
+                SetParameter(_params.m_parameters[i]);
             }
             return true;
-	    }
-        public void AddTransition(BobAnimatorState from, BobAnimatorState to, string uniquename, int uniquehash, List<AnimatorParameter> parameters,float time = 0)
-        {
-            AddTransition(from, to, uniquename, uniquehash);
-            m_TransitionParameters.AddValue(uniquename, parameters);
-            m_TransitionExitTime.AddValue(uniquename, time);
         }
+        public override bool SendGlobalEvent(string transname)
+        {
+            BobTransitionCondition _params = ((BobAnimatorState)this.m_AnyState).m_TransitionConditions.getValue(transname);
+            if (_params == null)
+            {
+                return false;
+            }
+            float _ExitTime = _params.m_ExitTime;
+            for (int i = 0; i < _params.m_parameters.Count; i++)
+            {
+                SetParameter(_params.m_parameters[i]);
+            }
+            return true;
+        }
+
         private void SetParameter(AnimatorParameter ap)
         {
             switch (ap.ParamType)
@@ -74,18 +86,18 @@ namespace Engine
             }
         }
 
-        bool m_bIsWaitingForExitTime = false;
-        AnimatorStateInfo m_currentStateInfo;
-        private string m_waitedEvent;
+        int m_currentStateHash;
         public override void OnUpdate()
         {
-            if (m_bIsWaitingForExitTime)
+            int newStateHash = m_Owner.GetNextAnimatorStateInfo(m_AnimatorLayer).nameHash;
+            if (newStateHash == 0)
             {
-                if (m_currentStateInfo.nameHash != m_Owner.GetCurrentAnimatorStateInfo(m_AnimatorLayer).nameHash)
-                {
-                    DoSendEvent(m_waitedEvent);
-                    m_bIsWaitingForExitTime = false;
-                }
+                return;
+            }
+            if (m_currentStateHash != newStateHash)
+            {
+                m_currentStateHash = newStateHash;
+                ChangeState(m_States.getValue(newStateHash), string.Empty);
             }
             base.OnUpdate();
         }
@@ -161,7 +173,7 @@ namespace Engine
                 }
             }
         }
-        public AnimatorParameter(string _name, AnimatorParameterType _type, object _value)
+        private AnimatorParameter(string _name, AnimatorParameterType _type, object _value)
         {
             Name = _name;
             ParamType = _type;
@@ -173,8 +185,49 @@ namespace Engine
             ParamType = src.ParamType;
             Value = src.Value;
         }
+        #region 工厂方法
+        public static AnimatorParameter CreateNewTrigger(string name) {
+            return new AnimatorParameter(name, AnimatorParameterType.TRIGGER, null);
+        }
+        public static AnimatorParameter CreateNewBool(string name, bool bvalue) {
+            return new AnimatorParameter(name, AnimatorParameterType.BOOL, bvalue);
+        }
+        public static AnimatorParameter CreateNewInt(string name, int ivalue) {
+            return new AnimatorParameter(name, AnimatorParameterType.INT, ivalue);
+        }
+        public static AnimatorParameter CreateNewFloat(string name, float fvalue)
+        {
+            return new AnimatorParameter(name, AnimatorParameterType.FLOAT, fvalue);
+        }
+        #endregion
     }
 
     #endregion
+
+    /// <summary>
+    /// 用于设置发送事件时需要改变的参数
+    /// </summary>
+    [System.Serializable]
+    public class BobTransitionCondition
+    {
+        public List<AnimatorParameter> m_parameters = new List<AnimatorParameter>();
+        public float m_ExitTime = 0;
+        public static BobTransitionCondition CreateTransitionCondition(List<AnimatorParameter> parameters, float exittime = 0)
+        {
+            BobTransitionCondition conditions = new BobTransitionCondition();
+            conditions.m_parameters.AddRange(parameters.ToArray());
+            conditions.m_ExitTime = exittime;
+            return conditions;
+        }
+    }
+    [System.Serializable]
+    public class BobTransitionConditionMap : BobDictionary<string, BobTransitionCondition> { }
+
+    /// <summary>
+    /// 将transition的hashId和event的名称对应起来
+    /// </summary>
+    [System.Serializable]
+    public class BobHashStateMap : BobDictionary<int, BobAnimatorState> { }
+    
 }
 
