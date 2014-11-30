@@ -1,0 +1,12 @@
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\Assembly-CSharp.dll
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\Assembly-CSharp.pdb
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\fastJSON.dll
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\UnityEditor.dll
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\UnityEngine.dll
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\Mono.Cecil.dll
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\nunit.framework.dll
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\Unity.DataContract.dll
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\obj\Debug\Assembly-CSharp.dll
+C:\Users\bob\Documents\GitHub\BobTestStateMachine\obj\Debug\Assembly-CSharp.pdb

@@ -25,10 +25,10 @@ namespace Engine
             AnimatorParameter _param3 = AnimatorParameter.CreateNewTrigger("Trigger_31");
             AnimatorParameter _param4 = AnimatorParameter.CreateNewInt("intParam", 0);
 
-            m_FSM0.m_parameters.Add(_param1);
-            m_FSM0.m_parameters.Add(_param2);
-            m_FSM0.m_parameters.Add(_param3);
-            m_FSM0.m_parameters.Add(_param4);
+            m_FSM0.m_parameters.AddValue(_param1.Name,_param1);
+            m_FSM0.m_parameters.AddValue(_param2.Name, _param2);
+            m_FSM0.m_parameters.AddValue(_param3.Name, _param3);
+            m_FSM0.m_parameters.AddValue(_param4.Name, _param4);
 
             BobTransitionCondition _condition1 = BobTransitionCondition.CreateTransitionCondition(new List<AnimatorParameter>() { _param1,_param2,_param4 },0.1f);
             BobTransitionCondition _condition2 = BobTransitionCondition.CreateTransitionCondition(new List<AnimatorParameter>() { _param2 }, 0.3f);

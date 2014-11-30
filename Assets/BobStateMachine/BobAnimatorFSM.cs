@@ -13,7 +13,7 @@ namespace Engine
         /// </summary>
         public int m_AnimatorLayer = 0;
         public BobHashStateMap m_States = new BobHashStateMap();
-        public List<AnimatorParameter> m_parameters = new List<AnimatorParameter>();
+        public BobNameParameterMap m_parameters = new BobNameParameterMap();
         public BobAnimatorState m_AnyState = new BobAnimatorState() { m_name = "AnyState"};
         public void AddTransition(BobAnimatorState from, BobAnimatorState to, string uniquename, int uniquehash, BobTransitionCondition parameters)
         {
@@ -101,6 +101,7 @@ namespace Engine
             }
             base.OnUpdate();
         }
+
     }
     #region ParameterTypeDefine
     public enum AnimatorParameterType
@@ -228,6 +229,9 @@ namespace Engine
     /// </summary>
     [System.Serializable]
     public class BobHashStateMap : BobDictionary<int, BobAnimatorState> { }
+
+    [System.Serializable]
+    public class BobNameParameterMap : BobDictionary<string, AnimatorParameter> { }
     
 }
 
