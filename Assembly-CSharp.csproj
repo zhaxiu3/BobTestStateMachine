@@ -39,10 +39,10 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>D:/Program Files (x86)/Unity/Unity3.4.3/Editor/Data/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>E:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>D:/Program Files (x86)/Unity/Unity3.4.3/Editor/Data/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>E:/Program Files (x86)/Unity/Editor/Data/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
@@ -57,6 +57,7 @@
      <Compile Include="Assets\BobStateMachine\BobUtils\BobDictionary.cs" />
      <Compile Include="Assets\TestStateMachine\Scripts\TestDataSerializable.cs" />
      <Compile Include="Assets\fastJSON\testJSON.cs" />
+     <None Include="Assets\ID_Bossroom03_Column01_D_Test.shader" />
  <Reference Include="fastJSON">
  <HintPath>Assets\fastJSON\fastJSON.dll</HintPath>
  </Reference>

@@ -10,3 +10,15 @@ C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\Unity.DataContr
 C:\Users\bob\Documents\GitHub\BobTestStateMachine\Temp\bin\Debug\ICSharpCode.NRefactory.dll
 C:\Users\bob\Documents\GitHub\BobTestStateMachine\obj\Debug\Assembly-CSharp.dll
 C:\Users\bob\Documents\GitHub\BobTestStateMachine\obj\Debug\Assembly-CSharp.pdb
+D:\Projects\BobTestStateMachine\Temp\bin\Debug\Assembly-CSharp.dll
+D:\Projects\BobTestStateMachine\Temp\bin\Debug\Assembly-CSharp.pdb
+D:\Projects\BobTestStateMachine\Temp\bin\Debug\fastJSON.dll
+D:\Projects\BobTestStateMachine\Temp\bin\Debug\UnityEditor.dll
+D:\Projects\BobTestStateMachine\Temp\bin\Debug\UnityEngine.dll
+D:\Projects\BobTestStateMachine\Temp\bin\Debug\Mono.Cecil.dll
+D:\Projects\BobTestStateMachine\Temp\bin\Debug\nunit.framework.dll
+D:\Projects\BobTestStateMachine\Temp\bin\Debug\Unity.DataContract.dll
+D:\Projects\BobTestStateMachine\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+D:\Projects\BobTestStateMachine\obj\Debug\Assembly-CSharp-vs.csprojResolveAssemblyReference.cache
+D:\Projects\BobTestStateMachine\obj\Debug\Assembly-CSharp.dll
+D:\Projects\BobTestStateMachine\obj\Debug\Assembly-CSharp.pdb

@@ -6,19 +6,46 @@ using UnityEditorInternal;
 
 namespace Engine
 {
+    /// <summary>
+    /// 现在的TransitionName无法在添加之后更改
+    /// 文档中应写上：在AnimatorController中添加上事件名
+    /// 这样之后的工作就是：设置事件中parameter的值
+    /// </summary>
     public class BobStateMachineEditorNew : EditorWindow
     {
-
-        [MenuItem("ByBob/OpenStateMachineEditor")]
-        static void OpenStateMachineEditor()
+        public static void OpenStateMachineEditor(BobStateMachineRoot target)
         {
             BobStateMachineEditorNew window = EditorWindow.GetWindow<BobStateMachineEditorNew>();
-            window.width = new List<int>() { 200, 200, 300 };
+            //window.m_titleWidthList = new List<int>() { 200, 200, 300 };
+            window.SetTarget(target);
         }
 
-        public List<int> width = new List<int>() { 200, 200, 300 };
-        Vector2 WindowSize;
+        public List<int> m_titleWidthList = new List<int>() { 300, 200, 300 };
+        /// <summary>
+        /// 编辑对象
+        /// </summary>
         BobStateMachineRoot m_target;
+
+        #region 公共方法
+        public void SetTarget(BobStateMachineRoot target)
+        {
+            m_target = target;
+            if (m_target == null)
+            {
+                return;
+            }
+            UpdateParameterNames();
+            UpdateParameterList();
+        }
+        public void UpdateParameterNames()
+        {
+            m_ParameterNames.Clear();
+            for (int i = 0; i < m_target.m_FSM0.m_parameters.Count; i++)
+            {
+                m_ParameterNames.Add(m_target.m_FSM0.m_parameters[i].Name);
+            }
+        }
+        #endregion
 
         #region 响应消息
         void OnGUI()
@@ -26,15 +53,12 @@ namespace Engine
             GameObject obj = Selection.activeGameObject;
             if (obj == null)
             {
-                m_target = null;
+                SetTarget(null);
             }
             else if (m_target != obj.GetComponent<BobStateMachineRoot>())
             {
                 OnSelectionChange();
             }
-
-            WindowSize.x = Screen.width;
-            WindowSize.y = Screen.height;
             
             if (m_target == null)
             {
@@ -81,12 +105,11 @@ namespace Engine
             GameObject obj = Selection.activeGameObject;
             if (obj == null)
             {
-                m_target = null;
+                SetTarget(null);
             }
             else if (m_target != obj.GetComponent<BobStateMachineRoot>())
             {
-                m_target = obj.GetComponent<BobStateMachineRoot>();
-                m_ParameterNames.Clear();
+                SetTarget(obj.GetComponent<BobStateMachineRoot>());
                 if (m_target == null)
                 {
                     return;
@@ -95,16 +118,14 @@ namespace Engine
                 {
                     return;
                 }
-                InitFromAnimator(obj.GetComponent<Animator>(), ref m_target.m_FSM0);
-                for (int i = 0; i < m_target.m_FSM0.m_parameters.Count; i++)
-                {
-                    m_ParameterNames.Add(m_target.m_FSM0.m_parameters[i].Name);
-                }
             }
 
         }
+
         #endregion
-        public void InitFromAnimator(Animator animator, ref BobAnimatorFSM fsm)
+
+        #region static方法
+        public static void InitFromAnimator(Animator animator, ref BobAnimatorFSM fsm)
         {
             AnimatorController _ac = AnimatorController.GetEffectiveAnimatorController(animator);
             AnimatorControllerLayer _aclyer =  _ac.GetLayer(fsm.m_AnimatorLayer);
@@ -115,20 +136,25 @@ namespace Engine
             fsm.m_parameters = GetAllParameters(_ac);
             for (int i = 0; i < _states.Count; i++)
             {
-                fsm.m_States.AddValue(_states[i].uniqueNameHash, BobAnimatorState.CreateState(_states[i].uniqueName));
-                Transition[] _transitions = _aclyer.stateMachine.GetTransitionsFromState(_states[i]);
+                State _curState = _states[i];
+                fsm.m_States.AddValue(_curState.uniqueNameHash, BobAnimatorState.CreateState(_curState.uniqueName));
+                Transition[] _transitions = _aclyer.stateMachine.GetTransitionsFromState(_curState);
                 for (int j = 0; j < _transitions.Length; j++)
                 {
-                    fsm.m_States[i].m_TransitionConditions.AddValue(_transitions[j].uniqueName, BobTransitionCondition.CreateTransitionCondition(new List<AnimatorParameter>()));
+                    fsm.m_States[i].m_TransitionConditions.AddValue(_transitions[j].name, BobTransitionCondition.CreateTransitionCondition(new List<AnimatorParameter>()));
                     int _conditionCount = _transitions[j].conditionCount;
                     for (int k = 0; k < _conditionCount; k++)
                     {
                         AnimatorCondition _condition = _transitions[j].GetCondition(k);
+                        if (_condition.mode == TransitionConditionMode.ExitTime)
+                        {
+                            //不管ExitTime
+                            continue;
+                        }
                         fsm.m_States[i].m_TransitionConditions[j].m_parameters.Add(fsm.m_parameters.getValue(_condition.parameter));
                     }
                 }
             }
-
         }
 
         public static List<State> GetAllSates(StateMachine fsm)
@@ -182,17 +208,29 @@ namespace Engine
             }
             return _parameters;
         }
-
+        #endregion
         #region 绘制函数
         Vector2 m_statelistviewScrollPos;
         int m_CurSelStateIndex = 0;
         string m_newstatename = "";
         BobAnimatorState m_currentState;
+        /// <summary>
+        /// 是否选中了AnyState
+        /// </summary>
+        bool m_bIsSelAnyState = false;
         void drawStateList()
         {
-            GUI.Box(new Rect(0, 0, width[0], Screen.height), "");
-            m_statelistviewScrollPos = EditorGUILayout.BeginScrollView(m_statelistviewScrollPos, GUILayout.Width(width[0]));
+            GUI.Box(new Rect(0, 0, m_titleWidthList[0], Screen.height), "");
+            m_statelistviewScrollPos = EditorGUILayout.BeginScrollView(m_statelistviewScrollPos, GUILayout.Width(m_titleWidthList[0]));
             {
+                if (GUILayout.Button(m_target.m_FSM0.m_AnyState.m_name))
+                {
+                    m_bIsSelAnyState = true;
+                    m_CurSelEventIndex = 0;
+                    m_CurSelParamIndex = 0;
+                    m_currentState = m_target.m_FSM0.m_AnyState;
+                    UpdateParameterList();
+                }
                 for (int i = 0; i < m_target.m_FSM0.m_States.Count; i++)
                 {
                     if (m_CurSelStateIndex == i)
@@ -206,8 +244,15 @@ namespace Engine
                     BobAnimatorState _currentState = m_target.m_FSM0.m_States[i];
                     EditorGUILayout.BeginHorizontal();
                     {
+                        EditorGUILayout.LabelField("IsDefault",GUILayout.Width(70));
+                        _currentState.active = EditorGUILayout.Toggle(_currentState.active,GUILayout.Width(20));
+                        if (_currentState.active == true)
+                        {
+                            m_target.m_FSM0.m_CurrentState = _currentState;
+                        }
                         if (GUILayout.Button(_currentState.m_name, GUILayout.Width(140)))
                         {
+                            m_bIsSelAnyState = false;
                             m_CurSelStateIndex = i;
                             m_CurSelEventIndex = 0;
                             m_CurSelParamIndex = 0;
@@ -242,13 +287,13 @@ namespace Engine
         void drawEventList()
         {
             GUI.backgroundColor = Color.gray;
-            GUI.Box(new Rect(width[0], 0, width[1], Screen.height), "");
+            GUI.Box(new Rect(m_titleWidthList[0], 0, m_titleWidthList[1], Screen.height), "");
             if (m_currentState == null)
             {
                 return;
             }
 
-            m_eventlistviewScrollPos = EditorGUILayout.BeginScrollView(m_eventlistviewScrollPos, GUILayout.Width(width[1]));
+            m_eventlistviewScrollPos = EditorGUILayout.BeginScrollView(m_eventlistviewScrollPos, GUILayout.Width(m_titleWidthList[1]));
             {
                 for (int i = 0; i < m_currentState.m_TransitionConditions.Count; i++)
                 {
@@ -319,7 +364,7 @@ namespace Engine
         int m_CurSelParamIndex = 0;
         void drawParameterList()
         {
-            GUI.Box(new Rect(width[0] + width[1], 0, width[2], Screen.height), "");
+            GUI.Box(new Rect(m_titleWidthList[0] + m_titleWidthList[1], 0, m_titleWidthList[2], Screen.height), "");
             if (m_currentState == null)
             {
                 return;
@@ -334,7 +379,7 @@ namespace Engine
                 return;
             }
 
-            m_paramlistviewScrollPos = EditorGUILayout.BeginScrollView(m_paramlistviewScrollPos, GUILayout.Width(width[2]));
+            m_paramlistviewScrollPos = EditorGUILayout.BeginScrollView(m_paramlistviewScrollPos, GUILayout.Width(m_titleWidthList[2]));
             {
                 for (int i = 0; i < m_currentState.m_TransitionConditions[m_CurSelEventIndex].m_parameters.Count; i++)
                 {

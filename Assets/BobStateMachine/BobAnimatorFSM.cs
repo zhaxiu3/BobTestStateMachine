@@ -5,6 +5,9 @@ using System.Collections.Generic;
 namespace Engine
 {
   
+    public class StateChangeEventArgs: System.EventArgs{
+
+    }
 	[System.Serializable]
 	public class BobAnimatorFSM : BobFSM<Animator>
     {
@@ -15,6 +18,12 @@ namespace Engine
         public BobHashStateMap m_States = new BobHashStateMap();
         public BobNameParameterMap m_parameters = new BobNameParameterMap();
         public BobAnimatorState m_AnyState = new BobAnimatorState() { m_name = "AnyState"};
+        #region 事件
+        public event System.EventHandler<StateChangeEventArgs> OnEnterEventHandler;
+        public event System.EventHandler<StateChangeEventArgs> OnExitEventHandler;
+        #endregion
+
+        #region 为编辑器开放的接口
         public void AddTransition(BobAnimatorState from, BobAnimatorState to, string uniquename, int uniquehash, BobTransitionCondition parameters)
         {
             base.AddTransition(from, to, uniquename, uniquehash);
@@ -25,7 +34,19 @@ namespace Engine
             base.AddGlobalTransition(to, uniquename, uniquehash);
             m_AnyState.m_TransitionConditions.AddValue(uniquename, parameters);
         }
+        #endregion
 
+        public void InitAnimatorFSM(Animator owner)
+        {
+            this.m_Owner = owner;
+            for (int i = 0; i < m_States.Count; i++)
+            {
+                if (m_States[i].active == true)
+                {
+                    this.m_CurrentState = m_States[i];
+                }
+            }
+        }
         public override bool SendEvent(string transname)
         {
             if (!IsEventAvailable(transname))
