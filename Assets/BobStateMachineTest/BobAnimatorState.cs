@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Engine
+namespace Engine.Test
 {
     [System.Serializable]
 	public class BobAnimatorState : BobState

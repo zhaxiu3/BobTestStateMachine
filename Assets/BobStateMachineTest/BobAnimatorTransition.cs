@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Engine
+namespace Engine.Test
 {
     [System.Serializable]
 	public class BobAnimatorTransition : BobTransition {

@@ -4,7 +4,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using UnityEditorInternal;
 
-namespace Engine
+namespace Engine.Test
 {
     /// <summary>
     /// 现在的TransitionName无法在添加之后更改

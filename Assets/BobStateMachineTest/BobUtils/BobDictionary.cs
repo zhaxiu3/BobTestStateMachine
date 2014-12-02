@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Engine
+namespace Engine.Test
 {
 	/// <summary>
 	/// 自己实现的可以在Inspector上显示的字典

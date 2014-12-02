@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-namespace Engine
+namespace Engine.Test
 {
     public enum BobStateEnum
     {

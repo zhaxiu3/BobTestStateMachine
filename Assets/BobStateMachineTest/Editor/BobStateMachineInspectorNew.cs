@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEditor;
 
-namespace Engine
+namespace Engine.Test
 {
 	[CustomEditor(typeof(BobStateMachineRoot))]
 	public class BobStateMachineInspectorNew : Editor {

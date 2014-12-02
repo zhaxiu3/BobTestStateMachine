@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Engine
+namespace Engine.Test
 {
 
     public class StateChangeEventArgs : System.EventArgs

@@ -46,8 +46,8 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\BobStateMachine\Editor\BobStateMachineEditorNew.cs" />
-     <Compile Include="Assets\BobStateMachine\Editor\BobStateMachineInspectorNew.cs" />
+     <Compile Include="Assets\BobStateMachineTest\Editor\BobStateMachineEditorNew.cs" />
+     <Compile Include="Assets\BobStateMachineTest\Editor\BobStateMachineInspectorNew.cs" />
  <Reference Include="fastJSON">
  <HintPath>Assets\fastJSON\fastJSON.dll</HintPath>
  </Reference>
