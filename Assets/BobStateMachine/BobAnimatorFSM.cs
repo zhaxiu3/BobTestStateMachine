@@ -5,9 +5,6 @@ using System.Collections.Generic;
 namespace Engine
 {
   
-    public class StateChangeEventArgs: System.EventArgs{
-
-    }
 	[System.Serializable]
 	public class BobAnimatorFSM : BobFSM<Animator>
     {
@@ -18,10 +15,7 @@ namespace Engine
         public BobHashStateMap m_States = new BobHashStateMap();
         public BobNameParameterMap m_parameters = new BobNameParameterMap();
         public BobAnimatorState m_AnyState = new BobAnimatorState() { m_name = "AnyState"};
-        #region 事件
-        public event System.EventHandler<StateChangeEventArgs> OnEnterEventHandler;
-        public event System.EventHandler<StateChangeEventArgs> OnExitEventHandler;
-        #endregion
+
 
         #region 为编辑器开放的接口
         public void AddTransition(BobAnimatorState from, BobAnimatorState to, string uniquename, int uniquehash, BobTransitionCondition parameters)
@@ -44,6 +38,7 @@ namespace Engine
                 if (m_States[i].active == true)
                 {
                     this.m_CurrentState = m_States[i];
+                    m_currentStateHash = Animator.StringToHash(m_CurrentState.m_name);
                 }
             }
         }
@@ -80,7 +75,7 @@ namespace Engine
             return true;
         }
 
-        private void SetParameter(AnimatorParameter ap)
+        public void SetParameter(AnimatorParameter ap)
         {
             switch (ap.ParamType)
             {
@@ -118,11 +113,19 @@ namespace Engine
             if (m_currentStateHash != newStateHash)
             {
                 m_currentStateHash = newStateHash;
-                ChangeState(m_States.getValue(newStateHash), string.Empty);
+                ChangeState(m_States.getValue(m_currentStateHash), string.Empty);
             }
             base.OnUpdate();
         }
 
+        protected override bool IsEventAvailable(string transname)
+        {
+            if (m_States.getValue(m_currentStateHash).m_TransitionConditions.ContainsKey(transname))
+            {
+                return true;
+            }
+            return false;
+        }
     }
     #region ParameterTypeDefine
     public enum AnimatorParameterType

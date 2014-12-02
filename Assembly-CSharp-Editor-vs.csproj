@@ -48,7 +48,6 @@
   <ItemGroup>
      <Compile Include="Assets\BobStateMachine\Editor\BobStateMachineEditorNew.cs" />
      <Compile Include="Assets\BobStateMachine\Editor\BobStateMachineInspectorNew.cs" />
-     <None Include="Assets\ID_Bossroom03_Column01_D_Test.shader" />
  <Reference Include="fastJSON">
  <HintPath>Assets\fastJSON\fastJSON.dll</HintPath>
  </Reference>

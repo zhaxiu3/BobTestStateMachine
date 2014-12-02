@@ -6,7 +6,7 @@ namespace Engine
         INVALID = -1
     }
 	[System.Serializable]
-	public class BobState<T>
+	public class BobState
 	{
 	    /// <summary>
 	    /// 当前是否激活
@@ -17,13 +17,15 @@ namespace Engine
 	    /// </summary>
 	    public string m_name;
         
-        public virtual void OnEnter(T owner, string transname) {
+        public virtual void OnEnter(object owner, string transname) {
             active = true;
         }
-        public virtual void OnExit(T owner, string transname) {
+        public virtual void OnExit(object owner, string transname)
+        {
             active = false;
         }
-        public virtual void OnUpdate(T owner) { 
+        public virtual void OnUpdate(object owner)
+        { 
         }
 
 	}

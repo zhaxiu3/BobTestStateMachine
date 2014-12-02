@@ -248,6 +248,16 @@ namespace Engine
                         _currentState.active = EditorGUILayout.Toggle(_currentState.active,GUILayout.Width(20));
                         if (_currentState.active == true)
                         {
+                            for (int j = 0; j < m_target.m_FSM0.m_States.Count; j++)
+                            {
+                                if (_currentState != m_target.m_FSM0.m_States[j])
+                                {
+                                    m_target.m_FSM0.m_States[j].active = false;
+                                }
+                            }
+                        }
+                        if (_currentState.active == true)
+                        {
                             m_target.m_FSM0.m_CurrentState = _currentState;
                         }
                         if (GUILayout.Button(_currentState.m_name, GUILayout.Width(140)))
@@ -284,6 +294,7 @@ namespace Engine
         Vector2 m_eventlistviewScrollPos;
         int m_CurSelEventIndex = 0;
         string m_newEventName = "";
+        string m_currentEventName = "";
         void drawEventList()
         {
             GUI.backgroundColor = Color.gray;
@@ -292,7 +303,15 @@ namespace Engine
             {
                 return;
             }
-
+            if (m_CurSelEventIndex >= m_currentState.m_TransitionConditions.Count)
+            {
+                m_CurSelEventIndex = 0;
+                return;
+            }
+            if (m_CurSelEventIndex >= 0 && m_CurSelEventIndex < m_currentState.m_TransitionConditions.Count )
+            {
+                m_currentState.m_TransitionConditions.KeyList[m_CurSelEventIndex] = EditorGUILayout.TextField(m_currentState.m_TransitionConditions.KeyList[m_CurSelEventIndex]);
+            }
             m_eventlistviewScrollPos = EditorGUILayout.BeginScrollView(m_eventlistviewScrollPos, GUILayout.Width(m_titleWidthList[1]));
             {
                 for (int i = 0; i < m_currentState.m_TransitionConditions.Count; i++)
@@ -317,7 +336,8 @@ namespace Engine
                         if (GUILayout.Button("-", GUILayout.Width(30)))
                         {
                             m_currentState.m_TransitionConditions.RemoveValue(_currentEvent);
-                            m_CurSelEventIndex = 0;
+                            m_CurSelEventIndex = 0; 
+                            UpdateParameterList();
                             break;
                         }
 

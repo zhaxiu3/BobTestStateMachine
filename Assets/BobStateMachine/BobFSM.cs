@@ -4,26 +4,44 @@ using System.Collections.Generic;
 
 namespace Engine
 {
+
+    public class StateChangeEventArgs : System.EventArgs
+    {
+        public BobState m_state;
+        public string m_eventName;
+        public StateChangeEventArgs(BobState state, string eventname)
+        {
+            m_state = state;
+            m_eventName = eventname;
+        }
+    }
 	public class BobFSM<T>
 	{
+
+
+        #region 状态进出事件
+        public event System.EventHandler<StateChangeEventArgs> OnEnterEventHandler;
+        public event System.EventHandler<StateChangeEventArgs> OnExitEventHandler;
+        #endregion
+
 	    /// <summary>
 	    /// 状态机的所有者
 	    /// </summary>
 	    protected T m_Owner;
-        public BobState<T> m_CurrentState;
-        private List<BobTransition<T>> m_Transitions = new List<BobTransition<T>>();
+        public BobState m_CurrentState;
+        private List<BobTransition> m_Transitions = new List<BobTransition>();
 
         #region 处理Global事件
-        public BobState<T> m_GlobalState;
-        private List<BobTransition<T>> m_GlobalTransitions = new List<BobTransition<T>>();
+        public BobState m_GlobalState;
+        private List<BobTransition> m_GlobalTransitions = new List<BobTransition>();
         #endregion
 
-        public void Init(BobState<T> InitialState, T owner)
+        public void Init(BobState InitialState, T owner)
         {
             setOwner(owner);
             Init(InitialState);
         }
-        public void Init(BobState<T> InitialState)
+        public void Init(BobState InitialState)
         {
             ChangeState(InitialState, string.Empty);
         }
@@ -39,9 +57,9 @@ namespace Engine
         /// <param name="to"></param>
         /// <param name="uniquename"></param>
         /// <param name="uniquehash"></param>
-        public virtual void AddTransition(BobState<T> from, BobState<T> to, string uniquename, int uniquehash)
+        public virtual void AddTransition(BobState from, BobState to, string uniquename, int uniquehash)
         {
-            BobTransition<T> _newTrans = new BobTransition<T>();
+            BobTransition _newTrans = new BobTransition();
             _newTrans.m_fromState = from;
             _newTrans.m_toState = to;
             _newTrans.m_uniqueName = uniquename;
@@ -64,13 +82,13 @@ namespace Engine
         protected void DoSendEvent(string transname)
         {
             int index = IndexOf(transname);
-            BobTransition<T> _trans = m_Transitions[index];
+            BobTransition _trans = m_Transitions[index];
             ChangeState(_trans.m_toState,_trans.m_uniqueName);
         }
 
-        public virtual void AddGlobalTransition(BobState<T> to, string uniquename, int uniquehash)
+        public virtual void AddGlobalTransition(BobState to, string uniquename, int uniquehash)
         {
-            BobTransition<T> _newTrans = new BobTransition<T>();
+            BobTransition _newTrans = new BobTransition();
             _newTrans.m_fromState = null;
             _newTrans.m_toState = to;
             _newTrans.m_uniqueName = uniquename;
@@ -85,18 +103,19 @@ namespace Engine
         protected void DoSendGlobalEvent(string transname)
         {
             int index = IndexOf(transname);
-            BobTransition<T> _trans = m_GlobalTransitions[index];
+            BobTransition _trans = m_GlobalTransitions[index];
             ChangeState(_trans.m_toState, _trans.m_uniqueName);
         }
 
-        protected bool IsEventAvailable(string transname)
+        protected virtual bool IsEventAvailable(string transname)
         {
             int index = IndexOf(transname);
             if (index == -1)
             {
+                Debug.Log("can not find transname " + transname);
                 return false;
             }
-            BobTransition<T> _trans = m_Transitions[index];
+            BobTransition _trans = m_Transitions[index];
 
             if (_trans.isGlobal)
             {//若是全局事件，则不判断当前状态
@@ -108,16 +127,24 @@ namespace Engine
             }
             return true;
         }
-        public void ChangeState(BobState<T> newState, string transname){
+        public void ChangeState(BobState newState, string transname){
             if(null != m_CurrentState)            
             {            
                 m_CurrentState.OnExit(m_Owner, transname);
+                if (OnExitEventHandler != null)
+                {
+                    OnExitEventHandler(this, new StateChangeEventArgs(m_CurrentState,transname));
+                }
             }
             if (newState == null)
             {
-                Debug.LogError("what i am null!!!!!");
+                Debug.LogError("newState is null!!!!!");
             }
             newState.OnEnter(m_Owner, transname);
+            if (OnEnterEventHandler != null)
+            {
+                OnEnterEventHandler(this, new StateChangeEventArgs(newState,transname));
+            }
             m_CurrentState = newState;
         }
         public virtual void OnUpdate() 

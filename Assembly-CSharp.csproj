@@ -57,7 +57,6 @@
      <Compile Include="Assets\BobStateMachine\BobUtils\BobDictionary.cs" />
      <Compile Include="Assets\TestStateMachine\Scripts\TestDataSerializable.cs" />
      <Compile Include="Assets\fastJSON\testJSON.cs" />
-     <None Include="Assets\ID_Bossroom03_Column01_D_Test.shader" />
  <Reference Include="fastJSON">
  <HintPath>Assets\fastJSON\fastJSON.dll</HintPath>
  </Reference>
