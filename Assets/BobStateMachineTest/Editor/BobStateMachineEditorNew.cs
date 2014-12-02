@@ -223,14 +223,21 @@ namespace Engine.Test
             GUI.Box(new Rect(0, 0, m_titleWidthList[0], Screen.height), "");
             m_statelistviewScrollPos = EditorGUILayout.BeginScrollView(m_statelistviewScrollPos, GUILayout.Width(m_titleWidthList[0]));
             {
+                if (m_bIsSelAnyState == true)
+                {
+                    GUI.backgroundColor = Color.gray;
+                }
                 if (GUILayout.Button(m_target.m_FSM0.m_AnyState.m_name))
                 {
                     m_bIsSelAnyState = true;
                     m_CurSelEventIndex = 0;
                     m_CurSelParamIndex = 0;
                     m_currentState = m_target.m_FSM0.m_AnyState;
+                    m_CurSelStateIndex = -1;
                     UpdateParameterList();
                 }
+                GUI.backgroundColor = Color.white;
+
                 for (int i = 0; i < m_target.m_FSM0.m_States.Count; i++)
                 {
                     if (m_CurSelStateIndex == i)
@@ -301,6 +308,7 @@ namespace Engine.Test
             GUI.Box(new Rect(m_titleWidthList[0], 0, m_titleWidthList[1], Screen.height), "");
             if (m_currentState == null)
             {
+                Debug.Log("current state is null");
                 return;
             }
             if (m_CurSelEventIndex >= m_currentState.m_TransitionConditions.Count)
