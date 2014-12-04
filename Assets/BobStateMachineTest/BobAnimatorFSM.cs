@@ -39,8 +39,10 @@ namespace Engine.Test
                 {
                     this.m_CurrentState = m_States[i];
                     m_currentStateHash = Animator.StringToHash(m_CurrentState.m_name);
+                    return;
                 }
             }
+            Debug.LogError("no state is designated as default!!!");
         }
         public override bool SendEvent(string transname)
         {

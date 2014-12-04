@@ -16,7 +16,6 @@ namespace Engine.Test
         public static void OpenStateMachineEditor(BobStateMachineRoot target)
         {
             BobStateMachineEditorNew window = EditorWindow.GetWindow<BobStateMachineEditorNew>();
-            //window.m_titleWidthList = new List<int>() { 200, 200, 300 };
             window.SetTarget(target);
         }
 
@@ -39,6 +38,9 @@ namespace Engine.Test
         }
         public void UpdateParameterNames()
         {
+            //获取animator的所有参数
+            AnimatorController _ac = AnimatorController.GetEffectiveAnimatorController(m_target.GetComponent<Animator>());
+            m_target.m_FSM0.m_parameters = GetAllParameters(_ac);
             m_ParameterNames.Clear();
             for (int i = 0; i < m_target.m_FSM0.m_parameters.Count; i++)
             {
@@ -51,6 +53,10 @@ namespace Engine.Test
         void OnGUI()
         {
             GameObject obj = Selection.activeGameObject;
+            if (Event.current.keyCode == KeyCode.S)
+            {//保存
+                EditorUtility.SetDirty(obj);
+            }
             if (obj == null)
             {
                 SetTarget(null);
@@ -141,7 +147,14 @@ namespace Engine.Test
                 Transition[] _transitions = _aclyer.stateMachine.GetTransitionsFromState(_curState);
                 for (int j = 0; j < _transitions.Length; j++)
                 {
-                    fsm.m_States[i].m_TransitionConditions.AddValue(_transitions[j].name, BobTransitionCondition.CreateTransitionCondition(new List<AnimatorParameter>()));
+                    try
+                    {
+                        fsm.m_States[i].m_TransitionConditions.AddValue(_transitions[j].name, BobTransitionCondition.CreateTransitionCondition(new List<AnimatorParameter>()));
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogError(fsm.m_States[i].m_name + " has same condition with name " + _transitions[j].name + " has totally"+_transitions.Length);
+                    }
                     int _conditionCount = _transitions[j].conditionCount;
                     for (int k = 0; k < _conditionCount; k++)
                     {
@@ -223,21 +236,14 @@ namespace Engine.Test
             GUI.Box(new Rect(0, 0, m_titleWidthList[0], Screen.height), "");
             m_statelistviewScrollPos = EditorGUILayout.BeginScrollView(m_statelistviewScrollPos, GUILayout.Width(m_titleWidthList[0]));
             {
-                if (m_bIsSelAnyState == true)
-                {
-                    GUI.backgroundColor = Color.gray;
-                }
                 if (GUILayout.Button(m_target.m_FSM0.m_AnyState.m_name))
                 {
                     m_bIsSelAnyState = true;
                     m_CurSelEventIndex = 0;
                     m_CurSelParamIndex = 0;
                     m_currentState = m_target.m_FSM0.m_AnyState;
-                    m_CurSelStateIndex = -1;
                     UpdateParameterList();
                 }
-                GUI.backgroundColor = Color.white;
-
                 for (int i = 0; i < m_target.m_FSM0.m_States.Count; i++)
                 {
                     if (m_CurSelStateIndex == i)
@@ -308,7 +314,6 @@ namespace Engine.Test
             GUI.Box(new Rect(m_titleWidthList[0], 0, m_titleWidthList[1], Screen.height), "");
             if (m_currentState == null)
             {
-                Debug.Log("current state is null");
                 return;
             }
             if (m_CurSelEventIndex >= m_currentState.m_TransitionConditions.Count)

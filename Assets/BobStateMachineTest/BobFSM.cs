@@ -5,23 +5,57 @@ using System.Collections.Generic;
 namespace Engine.Test
 {
 
-    public class StateChangeEventArgs : System.EventArgs
+    /// <summary>
+    /// 状态改变的事件参数，其中包含了相关的状态和事件名
+    /// </summary>
+    public class StateEventArgs : System.EventArgs
     {
+        /// <summary>
+        /// 发生改变的状态
+        /// </summary>
         public BobState m_state;
+        /// <summary>
+        /// 引起改变的事件名
+        /// </summary>
         public string m_eventName;
-        public StateChangeEventArgs(BobState state, string eventname)
+        public StateEventArgs(BobState state, string eventname)
         {
             m_state = state;
             m_eventName = eventname;
         }
     }
+
+
+    /// <summary>
+    /// 状态改变的事件参数，其中包含了相关的状态和事件名
+    /// </summary>
+    public class StateChangeEventArgs : System.EventArgs
+    {
+        /// <summary>
+        /// 发生改变的状态
+        /// </summary>
+        public BobState m_currentstate;
+        public BobState m_nextstate;
+        /// <summary>
+        /// 引起改变的事件名
+        /// </summary>
+        public string m_eventName;
+        public StateChangeEventArgs(BobState curstate,BobState nextstate, string eventname)
+        {
+            m_currentstate = curstate;
+            m_nextstate = nextstate;
+            m_eventName = eventname;
+        }
+    }
+
 	public class BobFSM<T>
 	{
 
 
         #region 状态进出事件
-        public event System.EventHandler<StateChangeEventArgs> OnEnterEventHandler;
-        public event System.EventHandler<StateChangeEventArgs> OnExitEventHandler;
+        public event System.EventHandler<StateEventArgs> OnEnterEventHandler;
+        public event System.EventHandler<StateEventArgs> OnExitEventHandler;
+        public event System.EventHandler<StateChangeEventArgs> OnStateChangeEventHandler;
         #endregion
 
 	    /// <summary>
@@ -128,22 +162,27 @@ namespace Engine.Test
             return true;
         }
         public void ChangeState(BobState newState, string transname){
+
             if(null != m_CurrentState)            
             {            
                 m_CurrentState.OnExit(m_Owner, transname);
                 if (OnExitEventHandler != null)
                 {
-                    OnExitEventHandler(this, new StateChangeEventArgs(m_CurrentState,transname));
+                    OnExitEventHandler(this, new StateEventArgs(m_CurrentState,transname));
                 }
             }
             if (newState == null)
             {
                 Debug.LogError("newState is null!!!!!");
             }
+            if (OnStateChangeEventHandler != null)
+            {
+                OnStateChangeEventHandler(this, new StateChangeEventArgs(m_CurrentState, newState, transname));
+            }
             newState.OnEnter(m_Owner, transname);
             if (OnEnterEventHandler != null)
             {
-                OnEnterEventHandler(this, new StateChangeEventArgs(newState,transname));
+                OnEnterEventHandler(this, new StateEventArgs(newState,transname));
             }
             m_CurrentState = newState;
         }
