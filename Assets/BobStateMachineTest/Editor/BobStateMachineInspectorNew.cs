@@ -14,6 +14,7 @@ namespace Engine.Test
         }
         public override void OnInspectorGUI()
         {
+            m_target.m_layer = EditorGUILayout.IntField("Layer Index", m_target.m_layer);
             EditorGUILayout.BeginHorizontal();
             {
                 if (GUILayout.Button("Editor"))

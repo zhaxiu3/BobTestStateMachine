@@ -30,9 +30,11 @@ namespace Engine.Test
         }
         #endregion
 
-        public void InitAnimatorFSM(Animator owner)
+        public void InitAnimatorFSM(Animator owner, int layer)
         {
             this.m_Owner = owner;
+            int ___________________________________________fixIt;//有可能Animator为null，或者animator没有被指定Controller，这些都应该做判断
+            this.m_AnimatorLayer = layer;
             for (int i = 0; i < m_States.Count; i++)
             {
                 if (m_States[i].active == true)

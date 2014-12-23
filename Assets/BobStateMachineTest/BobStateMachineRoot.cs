@@ -7,9 +7,10 @@ namespace Engine.Test
 	public class BobStateMachineRoot : MonoBehaviour
     {
         public BobAnimatorFSM m_FSM0 = new BobAnimatorFSM();
+        public int m_layer = 0;
         void Awake()
         {
-            m_FSM0.InitAnimatorFSM(GetComponent<Animator>());
+            m_FSM0.InitAnimatorFSM(GetComponent<Animator>(), m_layer);
                        
         }
 		
